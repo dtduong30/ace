@@ -33,13 +33,13 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.2.1
         with:
-          envs: DOCKER_USERNAME,SHORT_SHA,MONGODB_URI
+          envs: DOCKER_USERNAME,SHORT_SHA,MONGO_URI
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            echo "MONGODB_URI=$MONGO_URI" >> .env
+            echo "MONGODB_URI=$MONGO_URI" > .env
             TAGS=$(echo $SHORT_SHA | cut -c1-7)
             echo $TAGS
             docker pull $DOCKER_USERNAME/wishlist:$TAGS
