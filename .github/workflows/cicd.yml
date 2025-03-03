@@ -17,15 +17,15 @@ jobs:
       - name: Build docker image
         run: docker build -t wishlist .
       - name: Push image to docker hub
-        run: docker push duong/wishlist:latest
+        run: docker push wishlist:latest
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - name: Pull docker image
-        run: docker pull duong/wishlist:latest
+        run: docker pull wishlist:latest
       - name: Delete old container
         run: docker rm -f wishlist-container  
       - name: Run docker container          
-        run: docker run -d -p 8080:8080 --name wishlist-container duong/wishlist
+        run: docker run -d -p 8080:8080 --name wishlist-container wishlist
     
