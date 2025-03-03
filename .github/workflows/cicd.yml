@@ -4,28 +4,35 @@ on:
     branches: 
       - deploy-to-ec2
 
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_TAGS: ${GITHUB_SHA::7}
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
+      MONGO_URI: ${{ secrets.MONGODB_URI }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
       - name: Create .env
-        run: echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+        run: echo "MONGODB_URI=$MONGO_URI" >> .env
       - name: Login to docker hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        run: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_TOKEN"
       - name: Build docker image
-        run: docker build -t wishlist .
+        run: docker build -t $DOCKER_USERNAME/wishlist:$DOCKER_TAGS .
       - name: Push image to docker hub
-        run: docker push wishlist:latest
+        run: docker push $DOCKER_USERNAME/wishlist:$DOCKER_TAGS
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - name: Pull docker image
-        run: docker pull wishlist:latest
+        run: docker pull $DOCKER_USERNAME/wishlist:$DOCKER_TAGS
       - name: Delete old container
         run: docker rm -f wishlist-container  
       - name: Run docker container          
-        run: docker run -d -p 8080:8080 --name wishlist-container wishlist
+        run: docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:$DOCKER_TAGS
     
