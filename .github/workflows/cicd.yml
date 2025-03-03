@@ -6,7 +6,6 @@ on:
 
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_TAGS: ${GITHUB_SHA::7}
 
 jobs:
   build:
@@ -22,17 +21,17 @@ jobs:
       - name: Login to docker hub
         run: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_TOKEN"
       - name: Build docker image
-        run: docker build -t $DOCKER_USERNAME/wishlist:$DOCKER_TAGS .
+        run: docker build -t $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7} .
       - name: Push image to docker hub
-        run: docker push $DOCKER_USERNAME/wishlist:$DOCKER_TAGS
+        run: docker push $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - name: Pull docker image
-        run: docker pull $DOCKER_USERNAME/wishlist:$DOCKER_TAGS
+        run: docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
       - name: Delete old container
         run: docker rm -f wishlist-container  
       - name: Run docker container          
-        run: docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:$DOCKER_TAGS
+        run: docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
     
