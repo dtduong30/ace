@@ -33,7 +33,7 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.2.1
         with:
-          envs: DOCKER_USERNAME,SHORT_SHA
+          envs: DOCKER_USERNAME,SHORT_SHA,MONGODB_URI
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
