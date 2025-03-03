@@ -31,12 +31,14 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.2.1
         with:
+          envs: DOCKER_USERNAME
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
             echo "sTep deploy"
+            echo ${GITHUB_SHA::7}
             echo $DOCKER_USERNAME
             docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
             docker rm -f wishlist-container || true
