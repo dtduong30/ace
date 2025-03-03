@@ -38,6 +38,7 @@ jobs:
           script: | 
             whoami
             ls -al
+            echo $DOCKER_USERNAME
             docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
             docker rm -f wishlist-container  
             docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
