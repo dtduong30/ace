@@ -8,24 +8,24 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
 jobs:
-  # build:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     DOCKER_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
-  #     MONGO_URI: ${{ secrets.MONGODB_URI }}
-  #   steps:
-  #     - name: Checkout Source
-  #       uses: actions/checkout@v4
-  #     - name: Create .env
-  #       run: echo "MONGODB_URI=$MONGO_URI" >> .env
-  #     - name: Login to docker hub
-  #       run: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_TOKEN"
-  #     - name: Build docker image
-  #       run: docker build -t $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7} .
-  #     - name: Push image to docker hub
-  #       run: docker push $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
+      MONGO_URI: ${{ secrets.MONGODB_URI }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Create .env
+        run: echo "MONGODB_URI=$MONGO_URI" >> .env
+      - name: Login to docker hub
+        run: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_TOKEN"
+      - name: Build docker image
+        run: docker build -t $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7} .
+      - name: Push image to docker hub
+        run: docker push $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
   deploy:
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest
     env:
       SHORT_SHA: ${{ github.sha }}
@@ -39,11 +39,10 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            echo "LAYPHAT $SHORT_SHA"
-            echo "LAYPHAT $(echo $SHORT_SHA | cut -c1-7)"
-            echo "sTep deploy $DOCKER_USERNAME"
-            # docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
-            # docker rm -f wishlist-container || true
-            # docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
+            TAGS=$($SHORT_SHA | cut -c1-7)
+            echo $TAGS
+            docker pull $DOCKER_USERNAME/wishlist:$TAGS
+            docker rm -f wishlist-container || true
+            docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:$TAGS
 
     
