@@ -28,7 +28,7 @@ jobs:
     # needs: build
     runs-on: ubuntu-latest
     env:
-      SHORT_SHA: ${GITHUB_SHA::7}
+      SHORT_SHA: ${{ github.sha }}
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.2.1
@@ -40,6 +40,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "LAYPHAT $SHORT_SHA"
+            echo "LAYPHAT $(echo SHORT_SHA | cut -c1-7)"
             echo "sTep deploy $DOCKER_USERNAME"
             # docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
             # docker rm -f wishlist-container || true
