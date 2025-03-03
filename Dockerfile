@@ -5,7 +5,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -o wishlist main.go
+RUN go build -o wishlist cmd/main.go
 
 # Stage 2: Run
 FROM alpine:latest
