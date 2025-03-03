@@ -39,7 +39,7 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            TAGS=$($SHORT_SHA | cut -c1-7)
+            TAGS=$(echo $SHORT_SHA | cut -c1-7)
             echo $TAGS
             docker pull $DOCKER_USERNAME/wishlist:$TAGS
             docker rm -f wishlist-container || true
