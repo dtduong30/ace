@@ -37,11 +37,10 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            echo "sTep deploy"
-            echo ${GITHUB_SHA::7}
-            echo $DOCKER_USERNAME
-            docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
-            docker rm -f wishlist-container || true
-            docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
+            echo "HEHE ${GITHUB_SHA::7}"
+            echo "sTep deploy $DOCKER_USERNAME"
+            # docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
+            # docker rm -f wishlist-container || true
+            # docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
 
     
