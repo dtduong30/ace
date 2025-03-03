@@ -28,7 +28,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      SHORT_SHA: ${{ github.sha::7 }}
+      SHORT_SHA: ${GITHUB_SHA::7}
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.2.1
