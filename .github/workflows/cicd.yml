@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
-      MONGO_URI: ${{ secrets.MONGODB_URI }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -29,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SHORT_SHA: ${{ github.sha }}
+      MONGO_URI: ${{ secrets.MONGODB_URI }}
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.2.1
@@ -39,10 +39,11 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
           script: |
+            echo "MONGODB_URI=$MONGO_URI" >> .env
             TAGS=$(echo $SHORT_SHA | cut -c1-7)
             echo $TAGS
             docker pull $DOCKER_USERNAME/wishlist:$TAGS
             docker rm -f wishlist-container || true
-            docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:$TAGS
+            docker run -d -p 8080:8080 --env-file ./.env --name wishlist-container $DOCKER_USERNAME/wishlist:$TAGS
 
     
