@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
-      MONGO_URI: ${{ secrets.MONGODB_URI }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -26,12 +25,25 @@ jobs:
         run: docker push $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
   deploy:
     needs: build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    env:
+      SHORT_SHA: ${{ github.sha }}
+      MONGO_URI: ${{ secrets.MONGODB_URI }}
     steps:
-      - name: Pull docker image
-        run: docker pull $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
-      - name: Delete old container
-        run: docker rm -f wishlist-container  
-      - name: Run docker container          
-        run: docker run -d -p 8080:8080 --name wishlist-container $DOCKER_USERNAME/wishlist:${GITHUB_SHA::7}
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          envs: DOCKER_USERNAME,SHORT_SHA,MONGO_URI
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo "MONGODB_URI=$MONGO_URI" > .env
+            TAGS=$(echo $SHORT_SHA | cut -c1-7)
+            echo $TAGS
+            docker pull $DOCKER_USERNAME/wishlist:$TAGS
+            docker rm -f wishlist-container || true
+            docker run -d -p 8080:8080 --env-file ./.env --name wishlist-container $DOCKER_USERNAME/wishlist:$TAGS
+
     
